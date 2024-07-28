@@ -26,30 +26,79 @@ public_users.post("/register", (req,res) => {
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
   //Write your code here
-  res.send(JSON.stringify(books,null,4));
+  const getBooks = () => {
+    return new Promise((resolve,reject) => {
+      setTimeout(() => resolve(books),1000);
+    })
+  }
+  getBooks()
+  .then((books) => res.send(JSON.stringify(books,null,4)))
+  .catch((err) =>{
+    res.status(500).json({error: "An error occured"});
+  })
 });
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
   //Write your code here
+  const getBooksByIsbn = (isbn) => {
+    return new Promise((resolve,reject) =>{
+      setTimeout(() =>{
+        if (books[isbn]) {
+          resolve(books[isbn])
+        } else {
+          reject(new Error("Book not found"));
+        }
+      },1000);
+    });
+  }
+  
   const isbn = req.params.isbn;
-  res.send(books[isbn]);
- });
+  getBooksByIsbn(isbn)
+  .then((book) => res.send(book))
+  .catch((err) =>{
+    res.status(500).json(err.message);
+  })
+});
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
   //Write your code here
+  const getBooksByAuthor = (author) => {
+    return new Promise((resolve,reject) =>{
+      setTimeout(() =>{
+        const authorBooks = Object.values(books).filter((book) => book.author === author)
+        resolve(authorBooks)
+      },1000);
+    });
+  }
+
   const author = req.params.author;
-  const authorBooks = Object.values(books).filter((book) => book.author === author)
-  res.send(JSON.stringify(authorBooks,null,4));
+  getBooksByAuthor(author)
+  .then((books) => res.send(JSON.stringify(books,null,4)))
+  .catch((err) =>{
+    res.status(500).json(err.message);
+  })
 });
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
   //Write your code here
+  const getBooksByTitle = (title) => {
+    return new Promise((resolve,reject) =>{
+      setTimeout(() =>{
+        const titleBooks = Object.values(books).filter((book) => book.title === title)
+        resolve(titleBooks)
+      },1000);
+    })
+  }
+
   const title = req.params.title;
-  const titleBooks = Object.values(books).filter((book) => book.title === title)
-  res.send(JSON.stringify(titleBooks,null,4));
+  getBooksByTitle(title)
+  .then((books) => res.send(JSON.stringify(books,null,4)))
+  .catch((err) =>{
+    res.status(500).json(err.message);
+  })
 });
 
 //  Get book review
